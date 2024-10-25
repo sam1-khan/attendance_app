@@ -1,0 +1,45 @@
+{% extends "base_bootstrap.html" %}
+{% block content %}
+<div style="width: 40%" class="m-auto">
+{% if user.is_authenticated %}
+{% if attendance_list %}
+{% for attendance in attendance_list %}
+{% if attendance.owner_id == user.id %}
+<div class="form-floating mb-3">
+  <div class="form-control d-flex justify-content-between">{{ attendance.check_in }}
+    <a href="{% url 'attendance:attendance_update' attendance.id %}" class="align-self-end btn btn-primary btn-sm">Add</a>
+  </div>
+  <label for="floatingInput">Time in</label>
+</div>
+<div class="form-floating">
+  <div class="form-control d-flex justify-content-between">{{ attendance.check_in }}
+    <a href="{% url 'attendance:attendance_update' attendance.id %}" class="align-self-end btn btn-primary btn-sm">Add</a>
+  </div>
+  <label for="floatingPassword">Time out</label>
+</div>
+{% endif %}
+{% endfor %}
+{% else %}
+<div class="alert alert-primary" style="color: white" role="alert">
+  <h4 class="alert-heading">No Attendance Found!</h4>
+  <p>You have not marked your attendance for today.</p>
+  <hr>
+  <p class="mb-0"><a href="{% url 'attendance:attendance_create' %}">Mark Attendance</a></p>
+</div>
+{% endif %}
+</p>
+{% else %}
+<div class="alert alert-danger" style="color: white" role="alert">
+  <h4 class="alert-heading">You are not logged in!</h4>
+  <p>Please login to mark your attendance.<p>
+  <hr>
+  <a href="{% url 'login' %}?next={% url 'attendance:all' %}" class="btn btn-primary">Login</a>
+</div>
+{% endif %}
+</p>
+<p>
+{% if user.is_authenticated %}
+  <a href="{% url 'logout' %}?next={% url 'attendance:all' %}" class="btn btn-danger">Logout</a>
+{% endif %}
+</div>
+{% endblock %}
