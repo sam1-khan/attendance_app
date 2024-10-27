@@ -29,6 +29,16 @@ urlpatterns = [
 
 ]
 
+# Serve the favicon - Keep for later
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+urlpatterns += [
+    path('favicon.ico', serve, {
+            'path': 'favicon.ico',
+            'document_root': os.path.join(BASE_DIR, 'home/static'),
+        }
+    ),
+]
+
 # Switch to social login if it is configured - Keep for later
 try:
     from . import github_settings

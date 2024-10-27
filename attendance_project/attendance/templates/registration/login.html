@@ -1,0 +1,13 @@
+{% extends "base_bootstrap.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form method="post" style="margin: auto; width: 60%"  action="{% url 'login' %}">
+{% csrf_token %}
+{{ form|crispy }}
+<input type="submit" class="btn btn-primary" value="Login" />
+<input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+{% endblock %}
