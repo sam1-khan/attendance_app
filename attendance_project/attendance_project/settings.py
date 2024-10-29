@@ -132,3 +132,10 @@ LOGIN_REDIRECT_URL = '/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'in-v3.mailjet.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'c8c1b7387f5871e79715e8bc3fa6ef10'
+EMAIL_HOST_PASSWORD = '149e8cc8f8f6dcb4ec4c269a0d812946'
+DEFAULT_FROM_EMAIL = 'samikhan15262822@gmail.com'
