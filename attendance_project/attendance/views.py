@@ -1,8 +1,8 @@
 from attendance.models import Attendance
 from django.utils import timezone
-from django.views import View, generic
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
+from django.views import View
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.humanize.templatetags.humanize import naturaltime
@@ -17,10 +17,16 @@ class AttendanceListView(OwnerListView):
     def get(self, request) :
         if not request.user.is_authenticated:
             return redirect('login')
-        today = timezone.now().date()
-        attendance_list = Attendance.objects.filter(owner=request.user, check_in=today) or []
+        # Define the start and end of today
+        start_of_today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_today = timezone.now().replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        ctx = {'attendance_list' : attendance_list}
+        # Filter attendance records for the current user within today's date range
+        attendance_list = Attendance.objects.filter(
+            owner=request.user,
+            check_in__range=(start_of_today, end_of_today)
+        )
+        ctx = {'attendance_list' : attendance_list }
         return render(request, self.template_name, ctx)
 
 
@@ -35,13 +41,29 @@ class AttendanceDetailView(OwnerDetailView):
 
 class AttendanceCreateView(OwnerCreateView):
     model = Attendance
-    fields = ['check_in']
     template_name = "attendance/form.html"
+    fields = ['is_checked_in']
 
+#class AttendanceCreateView(LoginRequiredMixin, View):
+#    template_name = "attendance/form.html"
+#    success_url = reverse_lazy('attendance:all')
+#    format = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+#
+#    def get(self, request) : 
+#        ctx = {'attendance_form' : attendance_form, 'format' : self.format }
+#        return render(request, self.template_name, ctx)
+#
+#    def post(self, request) :
+#        if not attendance_form.is_valid():
+#            ctx = {'attendance_form' : attendance_form, 'format' : self.format }
+#            return render(request, self.template_name, ctx)
+#
+#        attendance = attendance_form.save()
+#        return redirect(self.success_url)
 
 class AttendanceUpdateView(OwnerUpdateView):
     model = Attendance
-    fields = ['check_out']
+    fields = ['is_checked_out']
     template_name = "attendance/form.html"
 
 
