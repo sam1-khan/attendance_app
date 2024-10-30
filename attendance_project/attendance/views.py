@@ -1,14 +1,8 @@
-from attendance.models import Attendance
+from .models import Attendance
 from django.utils import timezone
-from django.views import View
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.humanize.templatetags.humanize import naturaltime
 from .owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
 
-from django.db.models import Q
 
 class AttendanceListView(OwnerListView):
     model = Attendance
@@ -42,29 +36,33 @@ class AttendanceDetailView(OwnerDetailView):
 class AttendanceCreateView(OwnerCreateView):
     model = Attendance
     template_name = "attendance/form.html"
-    fields = ['is_checked_in']
 
-#class AttendanceCreateView(LoginRequiredMixin, View):
-#    template_name = "attendance/form.html"
-#    success_url = reverse_lazy('attendance:all')
-#    format = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-#
-#    def get(self, request) : 
-#        ctx = {'attendance_form' : attendance_form, 'format' : self.format }
-#        return render(request, self.template_name, ctx)
-#
-#    def post(self, request) :
-#        if not attendance_form.is_valid():
-#            ctx = {'attendance_form' : attendance_form, 'format' : self.format }
-#            return render(request, self.template_name, ctx)
-#
-#        attendance = attendance_form.save()
-#        return redirect(self.success_url)
 
 class AttendanceUpdateView(OwnerUpdateView):
     model = Attendance
-    fields = ['is_checked_out']
     template_name = "attendance/form.html"
 
 
+def send_reminder(self):
+    current_time = timezone.now()
+    reminder_threshold = current_time - timedelta(minutes=0)
+    employees_to_remind = Attendance.objects.filter(
+        is_checked_out=False,
+        check_in__lt=reminder_threshold  # Ensure the check_in is before the reminder threshold
+    )
+
+    for attendance in employees_to_remind:
+        subject = "Reminder: You have not checked out!"
+        message = (
+            f"Hello {self.employee.user.get_full_name() if self.employee.user.first_name else self.employee.user.get_username()},\n\n"
+            "This is a reminder that you have not marked your checkout for today. "
+            "Please make sure to check out to complete your attendance record.\n\n"
+            "Thank you!"
+        )
+
+        # Send email
+        self.employee.user.email_user(
+            subject,
+            message
+        )
 
