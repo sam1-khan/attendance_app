@@ -1,14 +1,13 @@
-from datetime import timedelta, timezone
-from ..attendance.models import Attendance
+import datetime
+from .models import Attendance
 from celery import shared_task
 
 @shared_task
 def send_reminder():
-    current_time = timezone.now()
-    reminder_threshold = current_time - timedelta(minutes=1)
     employees_to_remind = Attendance.objects.filter(
         is_checked_out=False,
-        check_in__lt=reminder_threshold  # Ensure the check_in is before the reminder threshold
+        check_in__isnull=False,
+        check_out__isnull=True
     )
 
     for emp in employees_to_remind:
@@ -25,3 +24,5 @@ def send_reminder():
             subject,
             message
         )
+
+    return f'Sent Emails to {employees_to_remind.count()} employees'
