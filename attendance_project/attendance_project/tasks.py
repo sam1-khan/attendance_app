@@ -1,6 +1,8 @@
 from datetime import timedelta, timezone
 from ..attendance.models import Attendance
+from celery import shared_task
 
+@shared_task
 def send_reminder():
     current_time = timezone.now()
     reminder_threshold = current_time - timedelta(minutes=1)
