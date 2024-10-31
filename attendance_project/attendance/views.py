@@ -1,8 +1,7 @@
 from .models import Attendance
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from .owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
-
+from .owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView
 
 class AttendanceListView(OwnerListView):
     model = Attendance
@@ -17,7 +16,7 @@ class AttendanceListView(OwnerListView):
 
         # Filter attendance records for the current user within today's date range
         attendance_list = Attendance.objects.filter(
-            owner=request.user,
+            employee__user=request.user,
             check_in__range=(start_of_today, end_of_today)
         )
         ctx = {'attendance_list' : attendance_list }
