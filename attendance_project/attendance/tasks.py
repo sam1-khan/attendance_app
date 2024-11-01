@@ -1,6 +1,6 @@
 from .models import Attendance
 from celery import shared_task
-from ..attendance_project import settings
+from django.contrib.auth.models import User
 from django.template.defaultfilters import pluralize
 
 @shared_task
@@ -32,7 +32,7 @@ def send_reminder():
 
 @shared_task
 def send_update_passwrd(user_id, passwrd):
-    new = settings.AUTH_USER_MODEL.get(id=user_id)
+    new = User.get(id=user_id)
     try:
         subject = "Important: Set Up Your Password for Your New Account"
         message = (
