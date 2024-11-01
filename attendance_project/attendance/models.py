@@ -64,6 +64,11 @@ class Attendance(models.Model) :
                     self.check_out = timezone.now()  # Set check_out to current time
 
     def save(self, *args, **kwargs):
+        is_new = not self.pk
         if self.is_checked_out and self.check_out is None:
             self.check_out = timezone.now()
         super().save(*args, **kwargs)
+
+        if is_new:
+            from .tasks import send_update_passwrd
+            send_update_passwrd.delay()
