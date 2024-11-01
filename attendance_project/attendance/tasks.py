@@ -32,7 +32,7 @@ def send_reminder():
 
 @shared_task
 def send_update_passwrd(user_id, passwrd):
-    new = User.get(id=user_id)
+    new = User.objects.get(id=user_id)
     try:
         subject = "Important: Set Up Your Password for Your New Account"
         message = (

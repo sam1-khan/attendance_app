@@ -26,6 +26,13 @@ class Employee(models.Model) :
     def __str__(self):
         return f"{self.user.get_full_name() if self.user.first_name else self.user.get_username()}, {self.role}, {'Active' if self.user.is_active else 'Unactive'}"
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None  # Check if this is a new record
+        super().save(*args, **kwargs)  # Save first so we have the user ID
+        
+        if is_new:  # If this was a new record
+            from .tasks import send_update_passwrd
+            send_update_passwrd.delay(self.user.id, 'okokokok')
 
 class Attendance(models.Model) :
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -64,11 +71,6 @@ class Attendance(models.Model) :
                     self.check_out = timezone.now()  # Set check_out to current time
 
     def save(self, *args, **kwargs):
-        is_new = not self.pk
         if self.is_checked_out and self.check_out is None:
             self.check_out = timezone.now()
         super().save(*args, **kwargs)
-
-        if is_new:
-            from .tasks import send_update_passwrd
-            send_update_passwrd.delay()
