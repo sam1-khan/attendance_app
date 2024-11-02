@@ -27,7 +27,7 @@ def send_reminder():
         )
     x = employees_to_remind.count()
     s = pluralize(x)
-    return f'Sent Email{s} to {x} employees {s}'
+    return f'Sent Email{s} to {x} employee{s}'
 
 
 @shared_task

@@ -153,4 +153,4 @@ GitHub.sublime-settings
 .history
 
 # Database #
-db.*
+db.sqlite3
