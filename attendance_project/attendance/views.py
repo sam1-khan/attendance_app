@@ -41,4 +41,5 @@ class AttendanceCreateView(OwnerCreateView):
 class AttendanceUpdateView(OwnerUpdateView):
     model = Attendance
     template_name = "attendance/form.html"
+    fields=['is_checked_out']
 
