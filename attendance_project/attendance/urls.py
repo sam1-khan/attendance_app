@@ -1,6 +1,5 @@
 from django.urls import path, reverse_lazy
 from . import views
-from django.views.generic import TemplateView
 
 # namespace:route_name
 app_name='attendance'

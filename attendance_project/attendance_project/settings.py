@@ -28,6 +28,7 @@ SECRET_KEY = 'django-insecure-nqbxeqwcr*-p34l)v342=-=(&50%y#77$q98tsscy^csfc&k)e
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+AUTH_USER_MODEL = "attendance.Employee"
 
 
 # Application definition

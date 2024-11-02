@@ -16,7 +16,7 @@ class AttendanceListView(OwnerListView):
 
         # Filter attendance records for the current user within today's date range
         attendance_list = Attendance.objects.filter(
-            employee__user=request.user,
+            employee=request.user,
             check_in__range=(start_of_today, end_of_today)
         )
         ctx = {'attendance_list' : attendance_list }
@@ -35,6 +35,7 @@ class AttendanceDetailView(OwnerDetailView):
 class AttendanceCreateView(OwnerCreateView):
     model = Attendance
     template_name = "attendance/form.html"
+    fields=['is_checked_out']
 
 
 class AttendanceUpdateView(OwnerUpdateView):

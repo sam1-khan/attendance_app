@@ -1,15 +1,16 @@
+from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import AbstractUser
 from django.shortcuts import get_object_or_404
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
+from .managers import CustomUserManager
 # Create your models here.
 
 
-class Employee(models.Model) :
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
+class Employee(AbstractUser):
     ROLE_CHOICES = (
         ('SWE', 'Software Engineer'),
         ('DE', 'Data Engineer'),
@@ -21,18 +22,27 @@ class Employee(models.Model) :
         ('QA', 'Quality Assurance Engineer'),
     )
 
+    username = None
+    email = models.EmailField(_("email address"), unique=True)
     role = models.CharField(choices=ROLE_CHOICES, max_length=3, default='SWE')
 
-    def __str__(self):
-        return f"{self.user.get_full_name() if self.user.first_name else self.user.get_username()}, {self.role}, {'Active' if self.user.is_active else 'Unactive'}"
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return f"{self.get_full_name() if self.first_name else self.get_username()}, {self.role}, {'Active' if self.is_active else 'Unactive'}"
+    
     def save(self, *args, **kwargs):
         is_new = self.pk is None  # Check if this is a new record
         super().save(*args, **kwargs)  # Save first so we have the user ID
-        
+
         if is_new:  # If this was a new record
             from .tasks import send_update_passwrd
-            send_update_passwrd.delay(self.user.id, 'okokokok')
+            send_update_passwrd.delay(self.id, 'okokokok')
+
 
 class Attendance(models.Model) :
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -60,13 +70,13 @@ class Attendance(models.Model) :
             )
 
             if existing_records.exists():
-                raise ValidationError("An attendance record for this employee already exists within the last 24 hours.")
+                raise ValidationError(_("An attendance record for this employee already exists within the last 24 hours."))
 
         if self.pk is not None:  # This means the object already exists
             original = get_object_or_404(Attendance, pk=self.pk)
             if original.is_checked_out != self.is_checked_out:
                 if original.is_checked_out:
-                    raise ValidationError("You cannot change is checked out once it's been set.")
+                    raise ValidationError(_("You cannot change is checked out once it's been set."))
                 if self.is_checked_out:  # If being checked out
                     self.check_out = timezone.now()  # Set check_out to current time
 
