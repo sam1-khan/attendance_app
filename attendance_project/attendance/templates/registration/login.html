@@ -8,6 +8,9 @@
 {{ form|crispy }}
 <input type="submit" class="btn btn-primary" value="Login" />
 <input type="hidden" name="next" value="{{ next }}" />
+<div class="d-flex flex-column my-4">
+    <a class="m-auto" href="{% url 'password_reset' %}">Forgot Password?</a>
+</div>
 </form>
 
 {% endblock %}

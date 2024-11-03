@@ -153,4 +153,4 @@ GitHub.sublime-settings
 .history
 
 # Database #
-db.sqlite3
+attendance_project/db.sqlite3
