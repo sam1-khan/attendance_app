@@ -30,6 +30,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = "attendance.Employee"
 PASSWORD_RESET_TIMEOUT = 300
+
+DOMAIN_NAME = "http://127.0.0.1:8000"  # Use this for local development
+
 # Application definition
 
 INSTALLED_APPS = [
