@@ -29,9 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = "attendance.Employee"
-PASSWORD_RESET_TIMEOUT = 3600
-
-
+PASSWORD_RESET_TIMEOUT = 300
 # Application definition
 
 INSTALLED_APPS = [
