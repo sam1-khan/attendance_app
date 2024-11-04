@@ -4,32 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset</title>
+  <title>Attendance Reminder</title>
 </head>
 <body style="background-color: #f8f9fa; font-family: Arial, sans-serif; margin: 0; padding: 0; font-size: 16px;">
   <div style="width: 100%; background-color: #f8f9fa; padding: 20px;">
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
       <div style="background-color: #007bff; padding: 20px; text-align: center; color: #ffffff;">
-        <h2 style="margin: 0; font-size: 24px;">Password Reset Request</h2>
+        <h2 style="margin: 0; font-size: 24px;">Reminder: Checkout Pending</h2>
       </div>
       <div style="padding: 20px;">
-        <p>Hello,</p>
-        <p>To initiate the password reset process for your account <strong>{{ user.email }}</strong>, please click the button below:</p>
-        
-        <div style="text-align: center; margin: 20px 0;">
-          <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}" 
+        <p>Hello {{ name }},</p>
+        <p>This is a reminder that you have not marked your checkout for today. Please make sure to check out to complete your attendance record.</p>
+        <!-- <div style="text-align: center; margin: 20px 0;">
+          <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'attendance:all' %}" 
              style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 12px 24px; border-radius: 4px; text-decoration: none;">
-            Reset Password
+            Checkout {{ request.scheme }}://{{ request.get_host }}{% url 'attendance:all' %}
           </a>
-        </div>
-        
-        <p>If clicking the button above doesn't work, copy and paste the URL below into your browser:</p>
-        <p style="word-wrap: break-word; color: #007bff;">
-          {{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
-        </p>
-        <br/>
-          <p>The above link will expire after 5 minutes.</p>
-        <br/>
+        </div> -->
         <p>Thank you,</p>
         <p>The Attendance App Team</p>
       </div>

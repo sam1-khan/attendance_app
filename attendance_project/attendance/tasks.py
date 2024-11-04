@@ -2,6 +2,9 @@ from .models import Attendance
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.template.defaultfilters import pluralize
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 @shared_task
 def send_reminder():
@@ -11,48 +14,53 @@ def send_reminder():
         check_out__isnull=True
     )
 
+    count = employees_to_remind.count()
+    s = pluralize(count)
+
     for emp in employees_to_remind:
         subject = "Reminder: You have not checked out!"
-        message = (
-            f"Hello {emp.employee.user.get_full_name() if emp.employee.user.first_name else emp.employee.user.get_username()},\n\n"
-            "This is a reminder that you have not marked your checkout for today. "
-            "Please make sure to check out to complete your attendance record.\n\n"
-            "Thank you!"
+        context = {
+            'name': emp.employee.get_full_name() if emp.employee.first_name else emp.employee.get_username(),
+        }
+        html_content = render_to_string('notification/reminder_email.html', context)
+        text_content = strip_tags(html_content)
+
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,
+            to=[emp.employee.email],
         )
 
-        # Send email
-        emp.employee.user.email_user(
-            subject,
-            message
-        )
-    x = employees_to_remind.count()
-    s = pluralize(x)
-    return f'Sent Email{s} to {x} employee{s}'
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+
+    return f'Sent Email{s} to {count} employee{s}'
 
 
 @shared_task
 def send_update_passwrd(user_id, passwrd):
     Employee = get_user_model()
-    new = Employee.objects.get(id=user_id)
     try:
+        new = Employee.objects.get(pk=user_id)
         subject = "Important: Set Up Your Password for Your New Account"
-        message = (
-            f"Hello {new.get_full_name() if new.first_name else new.get_username()},\n\n"
-            "Your HR has created an account for you on our attendance platform.\n\n"
-            "Login Details:\n"
-            f"Username: {new.get_username()}\n"
-            f"Temporary Password: {passwrd}\n\n"
-            "Next Steps:\n"
-            "1. Log in with the temporary password.\n"
-            "2. Go to “Account Settings” to set a new password.\n\n"
-            "Thank you!"
+        context = {
+            'name': new.get_full_name() if new.first_name else new.get_username(),
+            'username': new.get_username(),
+            'temporary_password': passwrd,
+        }
+
+        html_content = render_to_string('registration/password_setup_email.html', context)
+        text_content = strip_tags(html_content)
+
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,
+            to=[new.email],
         )
 
-        # Send email
-        new.email_user(
-            subject,
-            message
-        )
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+
         return f'Sent Email to new user, id: {user_id}'
     except:
         return f'Could not Send Email to new user, id: {user_id}'
