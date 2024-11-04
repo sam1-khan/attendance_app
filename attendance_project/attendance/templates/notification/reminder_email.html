@@ -6,26 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Attendance Reminder</title>
 </head>
-<body style="background-color: #f8f9fa; font-family: Arial, sans-serif; margin: 0; padding: 0; font-size: 16px;">
-  <div style="width: 100%; background-color: #f8f9fa; padding: 20px;">
-    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-      <div style="background-color: #007bff; padding: 20px; text-align: center; color: #ffffff;">
+<body style="background-color: rgba(255, 255, 255, 0); color: white; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; background-color: #151819; margin: auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); font-size: 16px;">
+    <div style="background-color: #007bff; padding: 20px; text-align: center; color: #ffffff;">
         <h2 style="margin: 0; font-size: 24px;">Reminder: Checkout Pending</h2>
-      </div>
-      <div style="padding: 20px;">
+    </div>
+      <div style="padding: 30px;">
         <p>Hello {{ name }},</p>
         <p>This is a reminder that you have not marked your checkout for today. Please make sure to check out to complete your attendance record.</p>
-        <!-- <div style="text-align: center; margin: 20px 0;">
-          <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'attendance:all' %}" 
-             style="display: inline-block; background-color: #007bff; color: #ffffff; padding: 12px 24px; border-radius: 4px; text-decoration: none;">
-            Checkout {{ request.scheme }}://{{ request.get_host }}{% url 'attendance:all' %}
-          </a>
-        </div> -->
         <p>Thank you,</p>
         <p>The Attendance App Team</p>
       </div>
     </div>
-  </div>
 </body>
 </html>
 {% endautoescape %}
