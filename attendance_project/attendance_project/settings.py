@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = "attendance.Employee"
+PASSWORD_RESET_TIMEOUT = 3600
 
 
 # Application definition

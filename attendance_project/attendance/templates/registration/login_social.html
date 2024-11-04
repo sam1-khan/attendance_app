@@ -30,6 +30,7 @@
 {{ form|crispy }}
 <input type="submit" class="btn btn-primary" value="Login Locally" />
 <input type="hidden" name="next" value="{{ next }}" />
+<a class="mx-2 px-1" href="{% url 'password_reset' %}">Forgot Password?</a>
 </form>
 
 {% if settings.SOCIAL_AUTH_GITHUB_KEY %}

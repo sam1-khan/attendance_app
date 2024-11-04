@@ -3,14 +3,12 @@
 
 {% block content %}
 
-<form method="post" style="margin: auto; width: 60%"  action="{% url 'login' %}">
+<form method="post" style="margin: auto; width: 60%" action="{% url 'login' %}">
 {% csrf_token %}
 {{ form|crispy }}
-<input type="submit" class="btn btn-primary" value="Login" />
+<input type="submit" class="btn btn-primary my-1 btn-sm" value="Login" />
 <input type="hidden" name="next" value="{{ next }}" />
-<div class="d-flex flex-column my-4">
-    <a class="m-auto" href="{% url 'password_reset' %}">Forgot Password?</a>
-</div>
+<a class="mx-2 px-1" href="{% url 'password_reset' %}"><small>Forgot Password?</small></a>
 </form>
 
 {% endblock %}
