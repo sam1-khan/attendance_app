@@ -5,16 +5,16 @@
     {% if attendance_list %}
         {% for attendance in attendance_list %}
             <div class="form-floating mb-3">
-              <div class="form-control d-flex justify-content-between">{{ attendance.check_in }}
-                <a href="{% url 'attendance:attendance_update' attendance.id %}" class="align-self-end btn btn-primary btn-sm">Add</a>
-              </div>
-              <label for="floatingInput">Time in</label>
+              <div class="form-control d-flex justify-content-between">{{ attendance.check_in }}</div>
+              <label>Time in</label>
             </div>
             <div class="form-floating">
               <div class="form-control d-flex justify-content-between">{{ attendance.check_out }}
-                <a href="{% url 'attendance:attendance_update' attendance.id %}" class="align-self-end btn btn-primary btn-sm">Add</a>
+                {% if not attendance.is_checked_out %}
+                  <button onclick="setCheckout({{ attendance.pk }})" class="align-self-end btn btn-primary btn-sm">Add</button>
+                {% endif%}
               </div>
-              <label for="floatingPassword">Time out</label>
+              <label>Time out</label>
             </div>
         {% endfor %}
     {% else %}
@@ -22,9 +22,10 @@
       <h4 class="alert-heading">Attendance Not Found!</h4>
       <p>You have not marked your attendance for today.</p>
       <hr>
-      <p class="mb-0"><a class="btn btn-primary btn-sm" href="{% url 'attendance:attendance_create' %}">Mark Attendance</a></p>
+      <p class="mb-0"><button class="btn btn-primary btn-sm" onclick="setCheckin()">Mark Attendance</button></p>
     </div>
     {% endif %}
+    <p class='my-4'><a href="{% url 'logout' %}?next={% url 'attendance:all' %}" class="btn btn-danger btn-sm">Logout</a></p>
 {% else %}
     <div class="alert alert-danger" style="color: white" role="alert">
       <h4 class="alert-heading">You are not logged in!</h4>
@@ -33,8 +34,39 @@
       <a href="{% url 'login' %}?next={% url 'attendance:all' %}" class="btn btn-sm btn-primary">Login</a>
     </div>
 {% endif %}
-{% if user.is_authenticated %}
-  <p class='my-4'><a href="{% url 'logout' %}?next={% url 'attendance:all' %}" class="btn btn-danger btn-sm">Logout</a></p>
-{% endif %}
 </div>
+<script>
+  function setCheckout(attendanceId) {
+      fetch(`/attendance/${attendanceId}/set_checkout/`, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          location.reload(); 
+      })
+      .catch(error => console.error('Error:', error));
+  }
+
+  function setCheckin() {
+    fetch(`/attendance/checkin/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data) {
+            console.log(data);
+            location.reload(); 
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+  </script>
 {% endblock %}
