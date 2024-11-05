@@ -26,11 +26,14 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+DEBUG_TEMPLATES = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'wotareudoing.serv00.net',
+    'localhost',
+]
 AUTH_USER_MODEL = "attendance.Employee"
 PASSWORD_RESET_TIMEOUT = 1800
-
 DOMAIN_NAME = "http://wotareudoing.serv00.net" 
 
 # Application definition
@@ -81,8 +84,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'attendance_project.wsgi.application'
-
-
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 60
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -130,6 +138,7 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
