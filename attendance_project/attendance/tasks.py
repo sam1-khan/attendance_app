@@ -1,5 +1,6 @@
 from .models import Attendance
 from celery import shared_task
+from datetime import timedelta
 from django.urls import reverse
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -10,14 +11,19 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.utils.html import strip_tags
+from django.utils import timezone
 
 @shared_task
 def send_reminder():
     try:
+        current_time = timezone.now()
+        time_threshold = current_time - timedelta(hours=24)
+
         employees_to_remind = Attendance.objects.filter(
             is_checked_out=False,
             check_in__isnull=False,
-            check_out__isnull=True
+            check_out__isnull=True,
+            check_in__range=[time_threshold, current_time]
         )
 
         count = employees_to_remind.count()
@@ -29,6 +35,7 @@ def send_reminder():
                 'name': emp.employee.get_full_name() if emp.employee.first_name else emp.employee.get_username(),
                 'domain': settings.DOMAIN_NAME,
             }
+
             html_content = render_to_string('notification/reminder_email.html', context)
             text_content = strip_tags(html_content)
 
@@ -47,7 +54,7 @@ def send_reminder():
 
 
 @shared_task
-def send_update_passwrd(user_id, passwrd):
+def send_password_update(user_id):
     Employee = get_user_model()
     try:
         new = Employee.objects.get(pk=user_id)
@@ -80,3 +87,28 @@ def send_update_passwrd(user_id, passwrd):
     except Exception as e:
         return f'Could not Send Email to new user, id: {user_id}, Error: {str(e)}'
         
+
+@shared_task
+def auto_check_out():
+    try:
+        current_time = timezone.now()
+        time_threshold = current_time - timedelta(hours=24)
+
+        employees_to_checkout = Attendance.objects.filter(
+            is_checked_out=False,
+            check_in__isnull=False,
+            check_out__isnull=True,
+            check_in__range=[time_threshold, current_time]
+        )
+
+        count = employees_to_checkout.count()
+        s = pluralize(count)
+
+        for emp in employees_to_checkout:
+            emp.check_out = timezone.now()
+            emp.is_checked_out = True
+            emp.save()
+
+        return f'Auto checked out {count} user{s}'
+    except Exception as e:
+        return f'Could not check out {count} user{s}, Error {str(e)}'

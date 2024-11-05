@@ -12,14 +12,14 @@ from .managers import CustomUserManager
 
 class Employee(AbstractUser):
     ROLE_CHOICES = (
-        ('SWE', 'Software Engineer'),
-        ('DE', 'Data Engineer'),
-        ('DS', 'Data Scientist'),
-        ('FE', 'Frontend Engineer'),
-        ('BE', 'Backend Engineer'),
-        ('FS', 'Full Stack Engineer'),
-        ('ML', 'Machine Learning Engineer'),
-        ('QA', 'Quality Assurance Engineer'),
+        ('SWE', _('Software Engineer')),
+        ('DE', _('Data Engineer')),
+        ('DS', _('Data Scientist')),
+        ('FE', _('Frontend Engineer')),
+        ('BE', _('Backend Engineer')),
+        ('FS', _('Full Stack Engineer')),
+        ('ML', _('Machine Learning Engineer')),
+        ('QA', _('Quality Assurance Engineer')),
     )
 
     username = None
@@ -33,15 +33,15 @@ class Employee(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return f"{self.get_full_name() if self.first_name else self.get_username()}, {self.role}, {'Active' if self.is_active else 'Unactive'}"
+        return f"{self.get_full_name() if self.first_name else self.get_username()}, {self.role}, {_('Active') if self.is_active else _('Unactive')}"
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None  # Check if this is a new record
         super().save(*args, **kwargs)  # Save first so we have the user ID
 
         if is_new:  # If this was a new record
-            from .tasks import send_update_passwrd
-            send_update_passwrd.delay(self.id, 'okokokok')
+            from .tasks import send_password_update
+            send_password_update.delay(self.id)
 
 
 class Attendance(models.Model) :
