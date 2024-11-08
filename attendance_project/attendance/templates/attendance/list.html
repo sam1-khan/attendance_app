@@ -1,72 +1,139 @@
-{% extends "base_bootstrap.html" %}
+{% extends "base_bootstrap.html" %} 
 {% block content %}
-<div style="width: 60%" class="m-auto my-4">
-{% if user.is_authenticated %}
-    {% if attendance_list %}
-        {% for attendance in attendance_list %}
-            <div class="form-floating mb-3">
-              <div class="form-control d-flex justify-content-between">{{ attendance.check_in }}</div>
-              <label>Time in</label>
-            </div>
-            <div class="form-floating">
-              <div class="form-control d-flex justify-content-between">{{ attendance.check_out }}
-                {% if not attendance.is_checked_out %}
-                  <button onclick="setCheckout({{ attendance.pk }})" class="align-self-end btn btn-primary btn-sm">Add</button>
-                {% endif%}
-              </div>
-              <label>Time out</label>
-            </div>
-        {% endfor %}
-    {% else %}
-    <div class="alert alert-primary" style="color: white" role="alert">
-      <h4 class="alert-heading">Attendance Not Found!</h4>
-      <p>You have not marked your attendance for today.</p>
-      <hr>
-      <p class="mb-0"><button class="btn btn-primary btn-sm" onclick="setCheckin()">Mark Attendance</button></p>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+  <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+    <path
+      d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"
+    />
+  </symbol>
+</svg>
+<div>
+  {% if user.is_authenticated %}
+  {% if attendance_list %} 
+	<h1 class="h3 mb-3 font-weight-normal">Mark Attendance</h1>
+  <span id="alertBox"></span>
+  {% for attendance in attendance_list %}
+  <div class="form-floating mb-3">
+    <div class="form-control d-flex justify-content-between">
+      {{ attendance.check_in }}
     </div>
-    {% endif %}
-    <p class='my-4'><a href="{% url 'logout' %}?next={% url 'attendance:all' %}" class="btn btn-danger btn-sm">Logout</a></p>
-{% else %}
-    <div class="alert alert-danger" style="color: white" role="alert">
-      <h4 class="alert-heading">You are not logged in!</h4>
-      <p>Please login to mark your attendance.<p>
-      <hr>
-      <a href="{% url 'login' %}?next={% url 'attendance:all' %}" class="btn btn-sm btn-primary">Login</a>
+    <label>Time in</label>
+  </div>
+  <div class="form-floating">
+    <div class="form-control d-flex justify-content-between">
+      {{ attendance.check_out }} 
+      {% if not attendance.is_checked_out %}
+      <button
+        onclick="setCheckout({{ attendance.pk }}); event.preventDefault();"
+        class="align-self-end btn btn-primary btn-sm"
+      >
+        Add
+      </button>
+      {% endif %}
     </div>
-{% endif %}
+    <label>Time out</label>
+  </div>
+  {% endfor %} 
+  {% else %}
+  <div class="alert alert-primary" style="color: white" role="alert">
+    <h4 class="alert-heading">Attendance Not Found!</h4>
+    <p>You have not marked your attendance for today.</p>
+    <hr />
+    <p class="mb-0">
+      <button class="btn btn-primary btn-sm" onclick="setCheckin()">
+        Mark Attendance
+      </button>
+    </p>
+  </div>
+  {% endif %}
+  <p class="my-4">
+    <a
+      href="{% url 'logout' %}?next={% url 'attendance:all' %}"
+      class="btn btn-danger btn-sm"
+      >Logout</a
+    >
+    <a
+      href="{% url 'password_change' %}?next={% url 'attendance:all' %}"
+      class="btn btn-secondary btn-sm"
+      >Change Password</a
+    >
+  </p>
+  {% else %}
+  <div class="alert alert-danger" style="color: white" role="alert">
+    <h4 class="alert-heading">You are not logged in!</h4>
+    <p>Please login to mark your attendance.</p>
+    <p></p>
+    <hr />
+    <a
+      href="{% url 'login' %}?next={% url 'attendance:all' %}"
+      class="btn btn-sm btn-primary"
+      >Login</a
+    >
+  </div>
+  {% endif %}
 </div>
 <script>
+  function showAlert(message) {
+    document.querySelector("#alertBox").innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </symbol>
+      </svg>
+      <div class="alert alert-success alert-dismissible d-flex align-items-center fade show" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+        <strong>${message}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>`;
+  }
+
   function setCheckout(attendanceId) {
-      fetch(`/attendance/${attendanceId}/set_checkout/`, {
-          method: 'POST',
-          headers: {
-              'X-CSRFToken': '{{ csrf_token }}',
-              'Content-Type': 'application/json'
-          }
+    fetch(`/attendance/${attendanceId}/set_checkout/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if (!data.is_new) {
+          sessionStorage.setItem("showAlertCheckout", "true");
+        }
+        location.reload();
       })
-      .then(response => response.json())
-      .then(data => {
-          location.reload(); 
-      })
-      .catch(error => console.error('Error:', error));
+      .catch((error) => console.error("Error:", error));
   }
 
   function setCheckin() {
     fetch(`/attendance/checkin/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json'
-        }
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json",
+      },
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data) {
-            console.log(data);
-            location.reload(); 
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.is_new) {
+          sessionStorage.setItem("showAlert", "true");
         }
-    })
-    .catch(error => console.error('Error:', error));
-}
-  </script>
+        location.reload();
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (sessionStorage.getItem("showAlertCheckout") === "true") {
+      showAlert("Check out marked successfully.");
+      sessionStorage.removeItem("showAlertCheckout");
+    }
+
+    if (sessionStorage.getItem("showAlert") === "true") {
+      showAlert("Attendance marked successfully.");
+      sessionStorage.removeItem("showAlert");
+    }
+  });
+</script>
 {% endblock %}

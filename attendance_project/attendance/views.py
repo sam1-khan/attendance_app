@@ -29,16 +29,18 @@ class SetCheckoutView(LoginRequiredMixin, View):
         attendance = get_object_or_404(Attendance, pk=pk, employee=request.user)
         if not attendance.is_checked_out:
             attendance.is_checked_out = True
+        is_new = attendance.pk is None 
         attendance.save()
 
-        return JsonResponse({'is_checked_out': attendance.is_checked_out})
+        return JsonResponse({'is_checked_out': attendance.is_checked_out, 'is_new': is_new, })
 
 class SetCheckinView(LoginRequiredMixin, View):
     def post(self, request):
         try:
             attendance = Attendance(employee=request.user)
             attendance.full_clean()
+            is_new = attendance.pk is None 
             attendance.save()
-            return JsonResponse({'check_in': attendance.check_in,})
+            return JsonResponse({'check_in': attendance.check_in, 'is_new': is_new,})
         except ValidationError as e:
             return JsonResponse({'error': str(e),}, status=400)
