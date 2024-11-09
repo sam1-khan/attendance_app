@@ -126,12 +126,12 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     if (sessionStorage.getItem("showAlertCheckout") === "true") {
-      showAlert("Check out marked successfully.");
+      showAlert("Time out marked successfully.");
       sessionStorage.removeItem("showAlertCheckout");
     }
 
     if (sessionStorage.getItem("showAlert") === "true") {
-      showAlert("Attendance marked successfully.");
+      showAlert("Time in marked successfully.");
       sessionStorage.removeItem("showAlert");
     }
   });
