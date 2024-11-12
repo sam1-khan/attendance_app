@@ -31,6 +31,7 @@ class EmployeeAdmin(UserAdmin):
 
 
 class AttendanceAdmin(admin.ModelAdmin):
+    date_hierarchy = 'check_in'
     search_fields = ('check_in', 'check_out', 'employee')  # Enable searching by 
     list_filter = ('is_checked_out',) 
     readonly_fields=('check_in', 'check_out')
