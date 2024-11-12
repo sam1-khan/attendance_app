@@ -1,11 +1,10 @@
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib.auth.models import AbstractUser
 from django.shortcuts import get_object_or_404
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
-from django.conf import settings
 from .managers import CustomUserManager
 # Create your models here.
 
@@ -28,7 +27,7 @@ class Employee(AbstractUser):
 
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["first_name", "last_name",]
 
     objects = CustomUserManager()
 
@@ -61,16 +60,19 @@ class Attendance(models.Model) :
 
     def clean(self):
         if self.pk is None:  # This means we're creating a new attendance record
-            current_time = timezone.now()
-            time_threshold = current_time - timedelta(hours=24)
+            try:
+                current_time = timezone.now()
+                time_threshold = current_time - timedelta(hours=24)
 
-            existing_records = Attendance.objects.filter(
-                employee=self.employee,
-                check_in__range=[time_threshold, current_time]
-            )
+                existing_records = Attendance.objects.filter(
+                    employee=self.employee,
+                    check_in__range=[time_threshold, current_time]
+                )
 
-            if existing_records.exists():
-                raise ValidationError(_("An attendance record for this employee already exists within the last 24 hours."))
+                if existing_records.exists():
+                    raise ValidationError(_("An attendance record for this employee already exists within the last 24 hours."))
+            except ObjectDoesNotExist:
+                raise ValidationError(_("Employee field for the attendance record can't be empty."))
 
         if self.pk is not None:  # This means the object already exists
             original = get_object_or_404(Attendance, pk=self.pk)
